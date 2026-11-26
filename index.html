@@ -53,14 +53,23 @@
       align-items: center;
       gap: 16px;
     }
-    .avatar {
+    .avatar-wrap {
       width: 68px;
       height: 68px;
       border-radius: 50%;
-      object-fit: cover;
+      overflow: hidden;
       border: 2px solid rgba(255, 255, 255, 0.5);
       background: #1a3573;
+      display: flex;
+      align-items: center;
+      justify-content: center;
       flex-shrink: 0;
+    }
+    .avatar {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+      display: block;
     }
     h1 {
       margin: 0 0 4px;
@@ -151,7 +160,9 @@
   <header>
     <div class="wrap profile-bar">
       <div class="profile-left">
-        <img class="avatar" src="./%EC%95%84%EB%B0%94%ED%83%80.png" alt="헬로WYS 아바타">
+        <div class="avatar-wrap">
+          <img class="avatar" src="./avatar.png" alt="" onerror="this.style.display='none'">
+        </div>
         <div>
           <h1>헬로WYS</h1>
           <p>AI·SW 강사 ESTHER WOO</p>
@@ -163,7 +174,7 @@
   <main>
     <div class="wrap">
       <div class="grid">
-        <a class="card" href="./QR/">
+        <a class="card" href="./qr/">
           <div>
             <span class="badge">도구</span>
             <h2>QR 만들기·읽기</h2>
@@ -171,7 +182,7 @@
           </div>
           <span class="go">앱 열기 →</span>
         </a>
-        <a class="card" href="./%ED%83%80%EC%9D%B4%EB%A8%B8/">
+        <a class="card" href="./timer/">
           <div>
             <span class="badge">수업·발표</span>
             <h2>발표·수업 타이머</h2>
@@ -179,7 +190,7 @@
           </div>
           <span class="go">앱 열기 →</span>
         </a>
-        <a class="card" href="./%EB%AC%B4%EC%9E%91%EC%9C%84/">
+        <a class="card" href="./random/">
           <div>
             <span class="badge">추첨·편성</span>
             <h2>랜덤 뽑기 &amp; 팀 나누기</h2>
@@ -187,7 +198,7 @@
           </div>
           <span class="go">앱 열기 →</span>
         </a>
-        <a class="card" href="./%EB%B6%84%ED%95%A0/">
+        <a class="card" href="./split/">
           <div>
             <span class="badge">정산·견적</span>
             <h2>간단 견적·정산 계산기</h2>
@@ -202,7 +213,7 @@
   <footer>
     <div class="wrap footer-inner">
       <span>© 헬로WYS · 강사 도구 모음</span>
-      <span>AI·SW 수업 및 바이브코딩 실습 도구 모음</span>
+      <span>문의: <a href="mailto:orangewys@naver.com">orangewys@naver.com</a></span>
     </div>
   </footer>
 </body>
