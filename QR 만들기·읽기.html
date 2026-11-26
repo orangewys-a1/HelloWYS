@@ -1,0 +1,425 @@
+<!doctype html><html><head><meta charset=utf8><meta name=viewport content="width=device-width,initial-scale=1,viewport-fit=cover"><style>:root{color-scheme:light;box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}html{scroll-padding-top:env(safe-area-inset-top,0px)}body{margin:0;padding:0;font:14px -apple-system,BlinkMacSystemFont,sans-serif;background:#fff;color:#000}img{max-width:100%}[hidden]:not([hidden=until-found i]){display:none!important}</style></head><body>
+<title>QR 만들기·읽기</title>
+<meta name="claude:viewport-fit-sides" content="cover">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Red+Hat+Display:wght@500;700&family=Noto+Sans+KR:wght@400;500;700&display=swap" rel="stylesheet">
+<style>
+/* VOICE everyday tool
+   IDEA a label printer: type on the left, the printed QR tag comes out on the right
+   PICTURE the live QR drawn large on a white tag; in read mode the scanned image with the found code outlined
+   COLOUR oxford blue band, white panels, magenta for the result and primary actions
+   TYPE Red Hat Display + Noto Sans KR
+   LAYOUT laptop: tabs in the band, controls left, big result right; phone: title, result, controls */
+:root{color-scheme:light dark;--bg:light-dark(#f4f6fb,#070f26);--band:light-dark(#0b1f4b,#0d2257);--panel:light-dark(#ffffff,#101a3a);--ink:light-dark(#0b1630,#e8ecf8);--soft:light-dark(#55607a,#a3adc8);--line:light-dark(#d5dbe8,#26335c);--acc:#e0115f;--acc2:light-dark(#fde7ef,#3a0f24);--ok:light-dark(#0b7a4b,#4fd69a)}
+:root[data-theme=light]{color-scheme:light}
+:root[data-theme=dark]{color-scheme:dark}
+*{box-sizing:border-box;min-width:0}
+body{margin:0;background:var(--bg);color:var(--ink);font:16px/1.55 "Noto Sans KR","Red Hat Display",system-ui,sans-serif;overflow-x:clip}
+.gut{padding-left:max(5vw,16px,env(safe-area-inset-left,0px));padding-right:max(5vw,16px,env(safe-area-inset-right,0px))}
+.wrap{max-width:1180px;margin:0 auto}
+header{background:var(--band);color:#fff;margin-top:calc(-1*env(safe-area-inset-top,0px));padding-top:calc(env(safe-area-inset-top,0px) + 28px);padding-bottom:0}
+h1{font:700 clamp(32px,5vw,46px)/1.05 "Red Hat Display","Noto Sans KR",sans-serif;letter-spacing:-.02em;margin:0 0 6px}
+header p{margin:0 0 22px;color:#c4cde6}
+.tabs{display:flex;gap:4px}
+.tab{appearance:none;border:0;background:transparent;color:#c4cde6;font:600 17px "Noto Sans KR",sans-serif;padding:12px 22px;border-radius:12px 12px 0 0;cursor:pointer;min-height:48px}
+.tab:hover{color:#fff}
+.tab[aria-selected=true]{background:var(--bg);color:var(--ink)}
+.tab:focus-visible,button:focus-visible,input:focus-visible,textarea:focus-visible,select:focus-visible{outline:3px solid var(--acc);outline-offset:2px}
+main{padding-block:28px 48px}
+.grid{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1.05fr);gap:24px;align-items:start}
+.panel{background:var(--panel);border:1px solid var(--line);border-radius:16px;padding:22px}
+.stage{position:sticky;top:16px}
+label.l{display:block;font-weight:600;margin:0 0 6px}
+.hint{color:var(--soft);font-size:14px;margin:6px 0 0}
+textarea,input[type=text],select{width:100%;font:16px "Noto Sans KR",sans-serif;color:var(--ink);background:var(--bg);border:1px solid var(--line);border-radius:10px;padding:12px}
+textarea{min-height:120px;resize:vertical}
+.chips{display:flex;flex-wrap:wrap;gap:8px;margin:12px 0 18px}
+.chip{border:1px solid var(--line);background:transparent;color:var(--ink);border-radius:99px;padding:8px 14px;font:14px "Noto Sans KR",sans-serif;cursor:pointer;min-height:40px}
+.chip:hover{border-color:var(--acc);color:var(--acc)}
+.row{display:grid;grid-template-columns:repeat(auto-fit,minmax(9em,1fr));gap:14px;margin-top:6px}
+.colors{display:flex;gap:10px;align-items:center}
+input[type=color]{width:48px;height:44px;border:1px solid var(--line);border-radius:10px;background:var(--bg);padding:3px;cursor:pointer}
+.btn{appearance:none;border:1px solid var(--line);background:var(--panel);color:var(--ink);font:600 16px "Noto Sans KR",sans-serif;border-radius:12px;padding:12px 18px;min-height:48px;cursor:pointer;display:inline-flex;align-items:center;justify-content:center;gap:8px;text-decoration:none}
+.btn:hover{border-color:var(--acc)}
+.btn.p{background:var(--acc);border-color:var(--acc);color:#fff}
+.btn.p:hover{filter:brightness(1.08)}
+.btn:disabled{opacity:.45;cursor:not-allowed}
+.acts{display:flex;flex-wrap:wrap;gap:10px;margin-top:18px}
+.tag{background:#fff;border-radius:18px;padding:clamp(16px,3vw,28px);box-shadow:0 1px 0 var(--line),0 12px 30px -18px rgba(11,31,75,.5);display:grid;place-items:center;aspect-ratio:1;max-width:520px;margin:0 auto}
+.tag canvas{width:100%;height:100%;image-rendering:pixelated;display:block}
+.meta{display:flex;justify-content:space-between;gap:12px;flex-wrap:wrap;color:var(--soft);font-size:14px;margin-top:14px}
+.msg{font-size:14px;min-height:1.4em;margin-top:10px;color:var(--soft)}
+.msg.err{color:var(--acc)}
+.msg.ok{color:var(--ok)}
+.drop{border:2px dashed var(--line);border-radius:16px;padding:22px;text-align:center;transition:border-color .15s,background .15s}
+.drop.on{border-color:var(--acc);background:var(--acc2)}
+.drop strong{display:block;font-size:18px;margin-bottom:4px}
+.vis{position:relative;background:#0b1630;border-radius:16px;overflow:hidden;aspect-ratio:4/3;display:grid;place-items:center}
+[hidden]{display:none!important}
+.vis video,.vis canvas{position:absolute;inset:0;width:100%;height:100%;object-fit:contain;display:block}
+.vis .ph{color:#9fb0d8;text-align:center;padding:24px;font-size:15px}
+.vis .ph svg{display:block;margin:0 auto 12px}
+.scanline{position:absolute;left:12%;right:12%;height:2px;background:var(--acc);box-shadow:0 0 12px var(--acc);animation:sc 2.2s ease-in-out infinite alternate;top:15%}
+@keyframes sc{to{top:85%}}
+@media (prefers-reduced-motion:reduce){.scanline{animation:none;top:50%}}
+.result{margin-top:16px;border-radius:14px;border:2px solid var(--acc);padding:16px;background:var(--acc2)}
+.result .k{font-size:13px;font-weight:700;color:var(--acc)}
+.result .v{font-size:18px;font-weight:500;overflow-wrap:anywhere;margin:4px 0 0;white-space:pre-wrap}
+.hist{list-style:none;padding:0;margin:8px 0 0}
+.hist li{display:flex;gap:10px;align-items:center;justify-content:space-between;border-top:1px solid var(--line);padding:10px 0}
+.hist span{overflow-wrap:anywhere;font-size:15px}
+.hist time{color:var(--soft);font-size:13px;white-space:nowrap}
+h2{font:700 20px "Noto Sans KR",sans-serif;margin:0 0 12px}
+.sec{margin-top:22px}
+.small{font-size:13px;color:var(--soft)}
+@media(max-width:820px){.grid{grid-template-columns:minmax(0,1fr)}.stage{position:static;order:-1}.tag{max-width:340px}.tab{padding:12px 16px}}
+</style>
+
+<header class="gut"><div class="wrap">
+  <h1>QR 만들기·읽기</h1>
+  <p>글이나 링크를 QR로 바꾸고, 카메라나 사진으로 QR을 읽어요.</p>
+  <div class="tabs" role="tablist">
+    <button class="tab" role="tab" id="t-make" aria-selected="true" aria-controls="v-make">QR 만들기</button>
+    <button class="tab" role="tab" id="t-read" aria-selected="false" aria-controls="v-read">QR 읽기</button>
+  </div>
+</div></header>
+
+<main class="gut"><div class="wrap">
+  <section id="v-make" role="tabpanel" aria-labelledby="t-make">
+    <div class="grid">
+      <div class="panel">
+        <label class="l" for="txt">QR에 담을 내용</label>
+        <textarea id="txt" placeholder="https://… 또는 아무 글이나">https://claude.ai</textarea>
+        <p class="hint" id="cnt"></p>
+        <div class="chips">
+          <button class="chip" data-p="url">웹 주소</button>
+          <button class="chip" data-p="wifi">와이파이</button>
+          <button class="chip" data-p="tel">전화번호</button>
+          <button class="chip" data-p="mail">이메일</button>
+          <button class="chip" data-p="text">메모</button>
+        </div>
+        <div class="row">
+          <div><label class="l" for="ecl">오류 복원 수준</label>
+            <select id="ecl"><option value="L">낮음 (7%)</option><option value="M" selected>보통 (15%)</option><option value="Q">높음 (25%)</option><option value="H">최고 (30%)</option></select></div>
+          <div><label class="l" for="sz">저장 크기</label>
+            <select id="sz"><option value="512">512 px</option><option value="1024" selected>1024 px</option><option value="2048">2048 px</option></select></div>
+        </div>
+        <div class="row sec">
+          <div><span class="l" style="display:block;font-weight:600;margin-bottom:6px">색상</span>
+            <div class="colors"><input type="color" id="fg" value="#0b1f4b" aria-label="QR 색"><input type="color" id="bg" value="#ffffff" aria-label="배경 색"><button class="chip" id="cReset">기본색</button></div></div>
+        </div>
+        <p class="hint">색이 너무 옅거나 배경과 비슷하면 잘 안 읽혀요. 진한 색 + 밝은 배경을 추천해요.</p>
+      </div>
+      <div class="stage">
+        <div class="tag" id="tag"><canvas id="qr" aria-label="생성된 QR 코드"></canvas></div>
+        <div class="meta"><span id="info"></span><span id="ver"></span></div>
+        <div class="acts" style="justify-content:center">
+          <button class="btn p" id="dl">PNG로 저장</button>
+          <button class="btn" id="cpImg">이미지 복사</button>
+          <button class="btn" id="test">바로 읽어보기</button>
+        </div>
+        <p class="msg" id="mMsg" style="text-align:center"></p>
+      </div>
+    </div>
+  </section>
+
+  <section id="v-read" role="tabpanel" aria-labelledby="t-read" hidden>
+    <div class="grid">
+      <div class="panel">
+        <h2>QR 불러오기</h2>
+        <div class="acts" style="margin-top:0">
+          <button class="btn p" id="camBtn">카메라로 스캔</button>
+          <label class="btn" for="snap">사진 찍기</label>
+          <input type="file" id="snap" accept="image/*" capture="environment" hidden>
+        </div>
+        <div class="drop sec" id="drop">
+          <strong>이미지를 여기로 끌어다 놓기</strong>
+          <span class="small">또는 <label for="file" style="color:var(--acc);cursor:pointer;text-decoration:underline">파일 선택</label> · 복사한 이미지는 Ctrl+V로 붙여넣기</span>
+          <input type="file" id="file" accept="image/*" hidden>
+        </div>
+        <p class="msg" id="rMsg"></p>
+        <div class="sec">
+          <h2>최근 읽은 내용</h2>
+          <ul class="hist" id="hist"></ul>
+          <p class="small" id="histEmpty">아직 없어요. 읽은 결과는 이 브라우저에만 저장돼요.</p>
+        </div>
+      </div>
+      <div class="stage">
+        <div class="vis" id="vis">
+          <div class="ph" id="ph"><svg width="64" height="64" viewBox="0 0 64 64" fill="none" stroke="#9fb0d8" stroke-width="4"><path d="M6 20V6h14M44 6h14v14M58 44v14H44M20 58H6V44"/><rect x="20" y="20" width="10" height="10" fill="#9fb0d8" stroke="none"/><rect x="34" y="20" width="10" height="10" fill="#9fb0d8" stroke="none"/><rect x="20" y="34" width="10" height="10" fill="#9fb0d8" stroke="none"/><rect x="38" y="38" width="6" height="6" fill="#e0115f" stroke="none"/></svg>카메라를 켜거나 이미지를 올리면<br>여기에 보여요.</div>
+          <video id="video" playsinline muted hidden></video>
+          <canvas id="shot" hidden></canvas>
+          <div class="scanline" id="line" hidden></div>
+        </div>
+        <div class="result" id="res" hidden>
+          <div class="k" id="resK">읽은 내용</div>
+          <p class="v" id="resV"></p>
+          <div class="acts">
+            <button class="btn p" id="cp">복사하기</button>
+            <a class="btn" id="open" target="_blank" rel="noopener noreferrer" hidden>링크 열기</a>
+            <button class="btn" id="stop" hidden>스캔 멈추기</button>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+</div></main>
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/qrcode-generator/1.4.4/qrcode.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/jsqr@1.4.0/dist/jsQR.js"></script>
+<script>
+{
+const $ = id => document.getElementById(id);
+const ECL_N = {L:'7%',M:'15%',Q:'25%',H:'30%'};
+let mods = null;
+
+/* ---------- tabs ---------- */
+function show(which){
+  const make = which === 'make';
+  $('t-make').setAttribute('aria-selected', make); $('t-read').setAttribute('aria-selected', !make);
+  $('v-make').hidden = !make; $('v-read').hidden = make;
+  if (make) stopCam();
+  try { localStorage.setItem('qr-tab', which); } catch(e){}
+}
+$('t-make').onclick = () => show('make');
+$('t-read').onclick = () => show('read');
+
+/* ---------- generator ---------- */
+const presets = {
+  url:'https://example.com',
+  wifi:'WIFI:T:WPA;S:우리집와이파이;P:비밀번호1234;;',
+  tel:'tel:010-1234-5678',
+  mail:'mailto:hello@example.com?subject=안녕하세요',
+  text:'오늘 회의는 3층 회의실에서 2시에 시작해요.'
+};
+document.querySelectorAll('[data-p]').forEach(b => b.onclick = () => { $('txt').value = presets[b.dataset.p]; $('txt').focus(); render(); });
+$('cReset').onclick = () => { $('fg').value = '#0b1f4b'; $('bg').value = '#ffffff'; render(); };
+
+function build(text, ecl){
+  qrcode.stringToBytes = qrcode.stringToBytesFuncs['UTF-8'];
+  const q = qrcode(0, ecl); q.addData(text, 'Byte'); q.make();
+  const n = q.getModuleCount(), m = [];
+  for (let r = 0; r < n; r++){ const row = []; for (let c = 0; c < n; c++) row.push(q.isDark(r, c)); m.push(row); }
+  return m;
+}
+function paint(cv, m, px, fg, bg){
+  const n = m.length, quiet = 4, total = n + quiet*2, cell = Math.max(1, Math.floor(px/total)), size = cell*total;
+  cv.width = size; cv.height = size;
+  const g = cv.getContext('2d');
+  g.fillStyle = bg; g.fillRect(0,0,size,size); g.fillStyle = fg;
+  for (let r = 0; r < n; r++) for (let c = 0; c < n; c++) if (m[r][c]) g.fillRect((c+quiet)*cell,(r+quiet)*cell,cell,cell);
+  return cv;
+}
+function render(){
+  const t = $('txt').value, ecl = $('ecl').value;
+  const bytes = new TextEncoder().encode(t).length;
+  $('cnt').textContent = t ? `${t.length}자 · ${bytes}바이트` : '';
+  $('mMsg').textContent = ''; $('mMsg').className = 'msg';
+  if (!t.trim()){ mods = null; $('qr').getContext('2d').clearRect(0,0,$('qr').width,$('qr').height); $('info').textContent = '내용을 입력하면 QR이 바로 그려져요'; $('ver').textContent=''; setGen(false); return; }
+  try {
+    mods = build(t, ecl);
+    paint($('qr'), mods, 640, $('fg').value, $('bg').value);
+    $('tag').style.background = $('bg').value;
+    const n = mods.length;
+    $('info').textContent = `${n}×${n} 칸 · 복원 ${ECL_N[ecl]}`;
+    $('ver').textContent = `버전 ${(n-17)/4}`;
+    setGen(true);
+  } catch(e){
+    mods = null; setGen(false);
+    $('mMsg').textContent = '내용이 너무 길어요. 줄이거나 오류 복원 수준을 낮춰 보세요.'; $('mMsg').className = 'msg err';
+  }
+}
+function setGen(on){ ['dl','cpImg','test'].forEach(id => $(id).disabled = !on); }
+['txt','ecl','fg','bg'].forEach(id => $(id).addEventListener('input', render));
+
+function exportBlob(){
+  const cv = paint(document.createElement('canvas'), mods, +$('sz').value, $('fg').value, $('bg').value);
+  return new Promise(res => cv.toBlob(res, 'image/png'));
+}
+function fname(){
+  const s = $('txt').value.replace(/^https?:\/\//,'').replace(/[^\w가-힣.-]+/g,'-').slice(0,40).replace(/^-|-$/g,'');
+  return `qr-${s || 'code'}.png`;
+}
+let dlCap = null;
+$('dl').onclick = async () => {
+  if (!mods) return;
+  const blob = await exportBlob(), m = $('mMsg');
+  try {
+    if (!dlCap && window.claude?.use) dlCap = await window.claude.use('downloads');
+    if (dlCap){ await dlCap.save({filename: fname(), data: blob}); m.textContent = '저장했어요.'; m.className = 'msg ok'; return; }
+  } catch(e){ if (e?.code === 'declined'){ m.textContent = '저장을 취소했어요.'; m.className='msg'; return; } }
+  try { const a = document.createElement('a'); a.href = URL.createObjectURL(blob); a.download = fname(); a.click(); m.textContent = '다운로드를 시작했어요. 안 되면 QR 이미지를 길게 눌러(또는 우클릭) 저장하세요.'; m.className='msg'; }
+  catch(e){ m.textContent = 'QR 이미지를 길게 눌러(또는 우클릭) 저장하세요.'; m.className='msg'; }
+};
+$('cpImg').onclick = async () => {
+  const m = $('mMsg');
+  try { const blob = await exportBlob(); await navigator.clipboard.write([new ClipboardItem({'image/png': blob})]); m.textContent = '이미지를 복사했어요. 원하는 곳에 붙여넣으세요.'; m.className='msg ok'; }
+  catch(e){ m.textContent = '이 브라우저에서는 이미지 복사가 안 돼요. PNG로 저장해 주세요.'; m.className='msg err'; }
+};
+$('test').onclick = () => { show('read'); decodeCanvas($('qr')); };
+
+/* ---------- reader ---------- */
+const video = $('video'), shot = $('shot');
+let stream = null, raf = 0, lastText = '';
+
+function decodeFrom(src, w, h){
+  // try at a few scales; big photos decode better downsized
+  for (const max of [1200, 800, 1800, 500]){
+    const k = Math.min(1, max/Math.max(w,h)), cw = Math.round(w*k), ch = Math.round(h*k);
+    const cv = document.createElement('canvas'); cv.width = cw; cv.height = ch;
+    const g = cv.getContext('2d', {willReadFrequently:true}); g.drawImage(src, 0, 0, cw, ch);
+    const d = g.getImageData(0,0,cw,ch);
+    const r = jsQR(d.data, cw, ch, {inversionAttempts:'attemptBoth'});
+    if (r) return {r, k};
+  }
+  return null;
+}
+function drawShot(src, w, h, hit){
+  const k = Math.min(1, 1400/Math.max(w,h));
+  shot.width = Math.round(w*k); shot.height = Math.round(h*k);
+  const g = shot.getContext('2d'); g.drawImage(src, 0, 0, shot.width, shot.height);
+  if (hit){
+    const L = hit.r.location, s = k/hit.k, pts = [L.topLeftCorner, L.topRightCorner, L.bottomRightCorner, L.bottomLeftCorner];
+    g.lineWidth = Math.max(4, shot.width/120); g.strokeStyle = '#e0115f'; g.lineJoin = 'round';
+    g.beginPath(); pts.forEach((p,i) => g[i?'lineTo':'moveTo'](p.x*s, p.y*s)); g.closePath(); g.stroke();
+  }
+  $('ph').hidden = true; video.hidden = true; $('line').hidden = true; shot.hidden = false;
+}
+function decodeCanvas(cv){
+  const hit = decodeFrom(cv, cv.width, cv.height);
+  drawShot(cv, cv.width, cv.height, hit);
+  hit ? showResult(hit.r.data) : noHit();
+}
+function noHit(){
+  $('res').hidden = true;
+  rmsg('QR을 찾지 못했어요. 더 가까이, 밝은 곳에서 흔들림 없이 찍어 보세요.', 'err');
+}
+function rmsg(t, cls){ $('rMsg').textContent = t; $('rMsg').className = 'msg' + (cls ? ' '+cls : ''); }
+
+function loadFile(f){
+  if (!f || !f.type.startsWith('image/')){ rmsg('이미지 파일만 읽을 수 있어요.', 'err'); return; }
+  stopCam();
+  const url = URL.createObjectURL(f), img = new Image();
+  img.onload = () => {
+    const hit = decodeFrom(img, img.naturalWidth, img.naturalHeight);
+    drawShot(img, img.naturalWidth, img.naturalHeight, hit);
+    hit ? showResult(hit.r.data) : noHit();
+    URL.revokeObjectURL(url);
+  };
+  img.onerror = () => rmsg('이미지를 열지 못했어요. 다른 형식(JPG, PNG)으로 시도해 보세요.', 'err');
+  img.src = url;
+}
+$('file').onchange = e => { loadFile(e.target.files[0]); e.target.value = ''; };
+$('snap').onchange = e => { loadFile(e.target.files[0]); e.target.value = ''; };
+const drop = $('drop');
+['dragenter','dragover'].forEach(t => drop.addEventListener(t, e => { e.preventDefault(); drop.classList.add('on'); }));
+['dragleave','drop'].forEach(t => drop.addEventListener(t, e => { e.preventDefault(); drop.classList.remove('on'); }));
+drop.addEventListener('drop', e => loadFile(e.dataTransfer.files[0]));
+document.addEventListener('paste', e => {
+  const it = [...(e.clipboardData?.items || [])].find(i => i.type.startsWith('image/'));
+  if (it){ show('read'); loadFile(it.getAsFile()); }
+});
+
+async function startCam(){
+  rmsg('카메라를 켜는 중…');
+  try {
+    stream = await navigator.mediaDevices.getUserMedia({video:{facingMode:'environment'}, audio:false});
+  } catch(e){
+    rmsg('이 화면에서는 실시간 카메라를 쓸 수 없어요. 대신 “사진 찍기”로 QR을 찍으면 바로 읽어요.', 'err');
+    return;
+  }
+  video.srcObject = stream; video.hidden = false; shot.hidden = true; $('ph').hidden = true; $('line').hidden = false;
+  await video.play().catch(()=>{});
+  $('camBtn').textContent = '카메라 끄기'; $('stop').hidden = false;
+  rmsg('QR을 화면 가운데에 비춰 주세요.');
+  lastText = '';
+  tick();
+}
+function tick(){
+  if (!stream) return;
+  if (video.readyState >= 2 && video.videoWidth){
+    const w = video.videoWidth, h = video.videoHeight, k = Math.min(1, 720/Math.max(w,h));
+    const cv = tick.cv || (tick.cv = document.createElement('canvas'));
+    cv.width = Math.round(w*k); cv.height = Math.round(h*k);
+    const g = cv.getContext('2d', {willReadFrequently:true}); g.drawImage(video, 0, 0, cv.width, cv.height);
+    const r = jsQR(g.getImageData(0,0,cv.width,cv.height).data, cv.width, cv.height, {inversionAttempts:'dontInvert'});
+    if (r && r.data !== lastText){
+      lastText = r.data;
+      drawShot(video, w, h, {r, k});
+      stopCam(true);
+      showResult(r.data);
+      try { navigator.vibrate?.(60); } catch(e){}
+      return;
+    }
+  }
+  raf = requestAnimationFrame(tick);
+}
+function stopCam(keepView){
+  cancelAnimationFrame(raf);
+  if (stream){ stream.getTracks().forEach(t => t.stop()); stream = null; }
+  video.hidden = true; $('line').hidden = true; $('stop').hidden = true;
+  $('camBtn').textContent = '카메라로 스캔';
+  if (!keepView && shot.hidden) $('ph').hidden = false;
+}
+$('camBtn').onclick = () => stream ? (stopCam(), rmsg('')) : startCam();
+$('stop').onclick = () => { stopCam(); rmsg(''); };
+
+function kind(t){
+  if (/^https?:\/\//i.test(t)) return '웹 주소';
+  if (/^WIFI:/i.test(t)) return '와이파이 정보';
+  if (/^tel:/i.test(t)) return '전화번호';
+  if (/^mailto:/i.test(t)) return '이메일';
+  if (/^BEGIN:VCARD/i.test(t)) return '연락처';
+  return '텍스트';
+}
+function showResult(t){
+  $('res').hidden = false;
+  $('resK').textContent = '읽은 내용 · ' + kind(t);
+  $('resV').textContent = t;
+  const link = /^https?:\/\//i.test(t.trim());
+  $('open').hidden = !link;
+  if (link) $('open').href = t.trim();
+  rmsg('QR을 읽었어요.', 'ok');
+  addHist(t);
+}
+$('cp').onclick = async () => {
+  try { await navigator.clipboard.writeText($('resV').textContent); rmsg('복사했어요.', 'ok'); }
+  catch(e){
+    const r = document.createRange(); r.selectNodeContents($('resV')); const s = getSelection(); s.removeAllRanges(); s.addRange(r);
+    rmsg('자동 복사가 막혀 있어요. 선택된 글을 Ctrl+C(길게 눌러 복사)로 복사하세요.', 'err');
+  }
+};
+
+/* ---------- history (this browser only) ---------- */
+let hist = [];
+try { hist = JSON.parse(localStorage.getItem('qr-hist') || '[]'); } catch(e){ hist = []; }
+function addHist(t){
+  hist = [{t, at: Date.now()}, ...hist.filter(h => h.t !== t)].slice(0, 8);
+  try { localStorage.setItem('qr-hist', JSON.stringify(hist)); } catch(e){}
+  drawHist();
+}
+function drawHist(){
+  const ul = $('hist'); ul.textContent = '';
+  $('histEmpty').hidden = hist.length > 0;
+  hist.forEach(h => {
+    const li = document.createElement('li'), sp = document.createElement('span'), tm = document.createElement('time'), b = document.createElement('button');
+    sp.textContent = h.t.length > 80 ? h.t.slice(0,80) + '…' : h.t;
+    const d = new Date(h.at); tm.textContent = `${d.getMonth()+1}/${d.getDate()} ${String(d.getHours()).padStart(2,'0')}:${String(d.getMinutes()).padStart(2,'0')}`;
+    b.className = 'chip'; b.textContent = '보기'; b.onclick = () => showResult(h.t);
+    const right = document.createElement('div'); right.style.cssText = 'display:flex;gap:8px;align-items:center;flex-shrink:0';
+    right.append(tm, b); li.append(sp, right); ul.append(li);
+  });
+}
+
+/* ---------- boot ---------- */
+if (typeof qrcode === 'undefined' || typeof jsQR === 'undefined'){
+  $('info').textContent = 'QR 라이브러리를 불러오지 못했어요. 새로고침해 주세요.';
+} else {
+  render(); drawHist();
+  let tab = 'make'; try { tab = localStorage.getItem('qr-tab') || 'make'; } catch(e){}
+  show(tab === 'read' ? 'read' : 'make');
+}
+}
+</script>
+
+</body></html>
