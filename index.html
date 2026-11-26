@@ -137,5 +137,224 @@
       </div>
     </div>
   </main>
+  <!doctype html>
+<html lang="ko">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1">
+  <title>헬로WYS | 앱 모음</title>
+  <style>
+    :root {
+      --bg: #f4f6fb;
+      --panel: #ffffff;
+      --band: #0b1f4b;
+      --ink: #0b1630;
+      --muted: #55607a;
+      --line: #d5dbe8;
+      --acc: #e0115f;
+    }
+    * { box-sizing: border-box; }
+    body {
+      margin: 0;
+      background: var(--bg);
+      color: var(--ink);
+      font-family: "Noto Sans KR", -apple-system, BlinkMacSystemFont, sans-serif;
+      line-height: 1.5;
+    }
+    header {
+      background: var(--band);
+      color: #fff;
+      padding: 32px 20px;
+    }
+    .wrap {
+      max-width: 900px;
+      margin: 0 auto;
+    }
+    /* 헤더 프로필(아바타 + 제목 + 이메일) 배치 */
+    .profile-bar {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      flex-wrap: wrap;
+      gap: 18px;
+    }
+    .profile-left {
+      display: flex;
+      align-items: center;
+      gap: 16px;
+    }
+    .avatar {
+      width: 68px;
+      height: 68px;
+      border-radius: 50%;
+      object-fit: cover;
+      border: 2px solid rgba(255, 255, 255, 0.35);
+      background: #1a3573;
+      flex-shrink: 0;
+    }
+    h1 {
+      margin: 0 0 4px;
+      font-size: 28px;
+    }
+    header p {
+      margin: 0;
+      color: #c4cde6;
+      font-size: 15px;
+    }
+    .contact-mail {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      color: #fff;
+      background: rgba(255, 255, 255, 0.12);
+      border: 1px solid rgba(255, 255, 255, 0.25);
+      padding: 8px 14px;
+      border-radius: 99px;
+      text-decoration: none;
+      font-size: 14px;
+      font-weight: 500;
+      transition: background-color .15s ease, border-color .15s ease;
+    }
+    .contact-mail:hover {
+      background: var(--acc);
+      border-color: var(--acc);
+    }
+    main {
+      padding: 28px 20px 40px;
+    }
+    .grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(260px, 1fr));
+      gap: 16px;
+    }
+    .card {
+      display: flex;
+      flex-direction: column;
+      justify-content: space-between;
+      background: var(--panel);
+      border: 1px solid var(--line);
+      border-radius: 14px;
+      padding: 20px;
+      text-decoration: none;
+      color: inherit;
+      transition: transform .15s ease, border-color .15s ease, box-shadow .15s ease;
+    }
+    .card:hover {
+      transform: translateY(-2px);
+      border-color: var(--acc);
+      box-shadow: 0 10px 24px -16px rgba(11, 31, 75, .35);
+    }
+    .badge {
+      display: inline-block;
+      font-size: 12px;
+      font-weight: 700;
+      color: var(--acc);
+      background: #fde7ef;
+      padding: 4px 10px;
+      border-radius: 99px;
+      margin-bottom: 12px;
+      width: fit-content;
+    }
+    .card h2 {
+      margin: 0 0 6px;
+      font-size: 19px;
+    }
+    .card p {
+      margin: 0 0 16px;
+      color: var(--muted);
+      font-size: 14px;
+    }
+    .go {
+      font-size: 14px;
+      font-weight: 700;
+      color: var(--acc);
+    }
+    footer {
+      border-top: 1px solid var(--line);
+      padding: 20px;
+      color: var(--muted);
+      font-size: 13px;
+    }
+    .footer-inner {
+      display: flex;
+      justify-content: space-between;
+      flex-wrap: wrap;
+      gap: 10px;
+    }
+    footer a {
+      color: var(--ink);
+      text-decoration: none;
+      font-weight: 600;
+    }
+    footer a:hover {
+      color: var(--acc);
+    }
+  </style>
+</head>
+<body>
+  <header>
+    <div class="wrap profile-bar">
+      <div class="profile-left">
+        <!-- 저장소에 avatar.png 파일을 올리면 표시됩니다 -->
+        <img class="avatar" src="./avatar.png" alt="강사 아바타">
+        <div>
+          <h1>헬로WYS</h1>
+          <p>직접 만든 웹 도구와 앱 모음 · AI·SW 강사</p>
+        </div>
+      </div>
+      <!-- 아래 이메일 주소를 실제 연락받을 메일 주소로 바꿔 주세요 -->
+      <a class="contact-mail" href="mailto:your-email@example.com">
+        ✉ your-email@example.com
+      </a>
+    </div>
+  </header>
+
+  <main>
+    <div class="wrap">
+      <div class="grid">
+        <a class="card" href="./qr/QR%20%EB%A7%8C%EB%93%A4%EA%B8%B0%C2%B7%EC%9D%BD%EA%B8%B0.html">
+          <div>
+            <span class="badge">도구</span>
+            <h2>QR 만들기·읽기</h2>
+            <p>글이나 링크를 QR 코드로 만들고, 카메라나 이미지로 QR을 읽는 웹앱입니다.</p>
+          </div>
+          <span class="go">앱 열기 →</span>
+        </a>
+        <a class="card" href="./timer/">
+          <div>
+            <span class="badge">수업·발표</span>
+            <h2>발표·수업 타이머</h2>
+            <p>분·초 설정과 프리셋, 남은 시간 색상 알림, 종료 알림음을 지원하는 타이머입니다.</p>
+          </div>
+          <span class="go">앱 열기 →</span>
+        </a>
+        <a class="card" href="./pick/">
+          <div>
+            <span class="badge">추첨·편성</span>
+            <h2>랜덤 뽑기 &amp; 팀 나누기</h2>
+            <p>목록을 붙여넣어 당첨자를 뽑거나 원하는 팀 수로 조를 나누는 웹앱입니다.</p>
+          </div>
+          <span class="go">앱 열기 →</span>
+        </a>
+        <a class="card" href="./split/">
+          <div>
+            <span class="badge">정산·견적</span>
+            <h2>간단 견적·정산 계산기</h2>
+            <p>항목별 금액과 인원 수를 입력해 총액, 부가세, 1인당 정산 금액과 안내 문구를 계산합니다.</p>
+          </div>
+          <span class="go">앱 열기 →</span>
+        </a>
+      </div>
+    </div>
+  </main>
+
+  <footer>
+    <div class="wrap footer-inner">
+      <span>© 헬로WYS · 강사 도구 모음</span>
+      <span>문의: <a href="mailto:your-email@example.com">orangewys@naver.com</a></span>
+    </div>
+  </footer>
+</body>
+</html>
 </body>
 </html>
