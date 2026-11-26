@@ -9,7 +9,6 @@
   <style>
     :root {
       --bg: #ffffff;
-      --soft-bg: #f8fafc;
       --panel: #ffffff;
       --band: #0b1f4b;
       --ink: #0b1630;
@@ -26,7 +25,6 @@
       font-family: "Noto Sans KR", -apple-system, BlinkMacSystemFont, sans-serif;
       line-height: 1.5;
     }
-    /* 위쪽 곤색 바 영역에만 cloud.png 배경 적용 */
     header {
       position: relative;
       background-color: var(--band);
@@ -74,7 +72,6 @@
       color: #dbe4fa;
       font-size: 15px;
     }
-    /* 하단 흰 배경 영역 */
     main {
       background: var(--bg);
       padding: 32px 20px 48px;
@@ -132,4 +129,81 @@
       border-top: 1px solid var(--line);
       padding: 20px;
       color: var(--muted);
-      font-size: 13
+      font-size: 13px;
+    }
+    .footer-inner {
+      display: flex;
+      justify-content: space-between;
+      flex-wrap: wrap;
+      gap: 10px;
+    }
+    footer a {
+      color: var(--ink);
+      text-decoration: none;
+      font-weight: 600;
+    }
+    footer a:hover {
+      color: var(--acc);
+    }
+  </style>
+</head>
+<body>
+  <header>
+    <div class="wrap profile-bar">
+      <div class="profile-left">
+        <img class="avatar" src="./%EC%95%84%EB%B0%94%ED%83%80.png" alt="헬로WYS 아바타">
+        <div>
+          <h1>헬로WYS</h1>
+          <p>AI·SW 강사 ESTHER WOO</p>
+        </div>
+      </div>
+    </div>
+  </header>
+
+  <main>
+    <div class="wrap">
+      <div class="grid">
+        <a class="card" href="./QR/">
+          <div>
+            <span class="badge">도구</span>
+            <h2>QR 만들기·읽기</h2>
+            <p>글이나 링크를 QR 코드로 만들고, 카메라나 이미지로 QR을 읽는 웹앱입니다.</p>
+          </div>
+          <span class="go">앱 열기 →</span>
+        </a>
+        <a class="card" href="./%ED%83%80%EC%9D%B4%EB%A8%B8/">
+          <div>
+            <span class="badge">수업·발표</span>
+            <h2>발표·수업 타이머</h2>
+            <p>분·초 설정과 프리셋, 남은 시간 색상 알림, 종료 알림음을 지원하는 타이머입니다.</p>
+          </div>
+          <span class="go">앱 열기 →</span>
+        </a>
+        <a class="card" href="./%EB%AC%B4%EC%9E%91%EC%9C%84/">
+          <div>
+            <span class="badge">추첨·편성</span>
+            <h2>랜덤 뽑기 &amp; 팀 나누기</h2>
+            <p>목록을 붙여넣어 당첨자를 뽑거나 원하는 팀 수로 조를 나누는 웹앱입니다.</p>
+          </div>
+          <span class="go">앱 열기 →</span>
+        </a>
+        <a class="card" href="./%EB%B6%84%ED%95%A0/">
+          <div>
+            <span class="badge">정산·견적</span>
+            <h2>간단 견적·정산 계산기</h2>
+            <p>항목별 금액과 인원 수를 입력해 총액, 부가세, 1인당 정산 금액과 안내 문구를 계산합니다.</p>
+          </div>
+          <span class="go">앱 열기 →</span>
+        </a>
+      </div>
+    </div>
+  </main>
+
+  <footer>
+    <div class="wrap footer-inner">
+      <span>© 헬로WYS · 강사 도구 모음</span>
+      <span>AI·SW 수업 및 바이브코딩 실습 도구 모음</span>
+    </div>
+  </footer>
+</body>
+</html>
