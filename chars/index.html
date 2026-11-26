@@ -15,7 +15,6 @@
       --muted: #55607a;
       --line: #d5dbe8;
       --acc: #e0115f;
-      --soft-acc: #fde7ef;
     }
     * { box-sizing: border-box; }
     body {
@@ -34,13 +33,6 @@
     .wrap {
       max-width: 900px;
       margin: 0 auto;
-    }
-    .top-bar {
-      display: flex;
-      align-items: center;
-      justify-content: space-between;
-      flex-wrap: wrap;
-      gap: 12px;
     }
     .back-link {
       display: inline-flex;
@@ -155,4 +147,152 @@
       border-radius: 10px;
       padding: 14px;
       font-family: inherit;
-      font-size
+      font-size: 15.5px;
+      line-height: 1.7;
+      color: var(--ink);
+      outline: none;
+    }
+    textarea:focus {
+      border-color: var(--band);
+      box-shadow: 0 0 0 3px rgba(11, 31, 75, 0.1);
+    }
+    .toast {
+      margin-top: 10px;
+      min-height: 20px;
+      font-size: 13px;
+      font-weight: 700;
+      color: var(--acc);
+    }
+  </style>
+</head>
+<body>
+  <header>
+    <div class="wrap">
+      <a class="back-link" href="../">← 앱 모음으로 돌아가기</a>
+      <h1>글자 수·바이트 계산기</h1>
+      <p>공백 포함/제외 글자 수, 단어 수, 줄 수, 바이트 수를 실시간으로 확인하세요.</p>
+    </div>
+  </header>
+
+  <main>
+    <div class="wrap">
+      <section class="stats" aria-label="글자 수 통계">
+        <div class="stat-card">
+          <div class="stat-label">공백 포함</div>
+          <div class="stat-value highlight" id="withSpace">0자</div>
+        </div>
+        <div class="stat-card">
+          <div class="stat-label">공백 제외</div>
+          <div class="stat-value" id="withoutSpace">0자</div>
+        </div>
+        <div class="stat-card">
+          <div class="stat-label">단어 수</div>
+          <div class="stat-value" id="wordCount">0개</div>
+        </div>
+        <div class="stat-card">
+          <div class="stat-label">줄 수</div>
+          <div class="stat-value" id="lineCount">0줄</div>
+        </div>
+        <div class="stat-card">
+          <div class="stat-label">UTF-8 / 2바이트 기준</div>
+          <div class="stat-value" id="byteCount" style="font-size: 17px;">0B / 0B</div>
+        </div>
+      </section>
+
+      <section class="editor-box">
+        <div class="toolbar">
+          <span class="sub-info" id="manuscriptInfo">200자 원고지 약 0매</span>
+          <div class="btn-group">
+            <button type="button" id="sampleBtn">예시 넣기</button>
+            <button type="button" id="clearBtn">지우기</button>
+            <button type="button" class="primary" id="copyBtn">텍스트 복사</button>
+          </div>
+        </div>
+        <textarea id="textInput" placeholder="여기에 글을 입력하거나 붙여넣으세요..."></textarea>
+        <div class="toast" id="toastMsg"></div>
+      </section>
+    </div>
+  </main>
+
+  <script>
+    (function () {
+      const textInput = document.getElementById("textInput");
+      const withSpaceEl = document.getElementById("withSpace");
+      const withoutSpaceEl = document.getElementById("withoutSpace");
+      const wordCountEl = document.getElementById("wordCount");
+      const lineCountEl = document.getElementById("lineCount");
+      const byteCountEl = document.getElementById("byteCount");
+      const manuscriptInfoEl = document.getElementById("manuscriptInfo");
+      const toastMsgEl = document.getElementById("toastMsg");
+      const encoder = new TextEncoder();
+      let toastTimer = null;
+
+      function getTwoByteLength(str) {
+        let total = 0;
+        for (const ch of str) {
+          total += ch.charCodeAt(0) > 127 ? 2 : 1;
+        }
+        return total;
+      }
+
+      function showToast(msg) {
+        toastMsgEl.textContent = msg;
+        clearTimeout(toastTimer);
+        toastTimer = setTimeout(() => {
+          toastMsgEl.textContent = "";
+        }, 2000);
+      }
+
+      function updateStats() {
+        const text = textInput.value || "";
+        const withSpace = Array.from(text).length;
+        const noSpaceText = text.replace(/\s+/g, "");
+        const withoutSpace = Array.from(noSpaceText).length;
+        const words = text.trim() ? text.trim().split(/\s+/).length : 0;
+        const lines = text.length ? text.split(/\r\n|\r|\n/).length : 0;
+        const utf8Bytes = encoder.encode(text).length;
+        const twoBytes = getTwoByteLength(text);
+        const pages = (withSpace / 200).toFixed(1);
+
+        withSpaceEl.textContent = `${withSpace.toLocaleString()}자`;
+        withoutSpaceEl.textContent = `${withoutSpace.toLocaleString()}자`;
+        wordCountEl.textContent = `${words.toLocaleString()}개`;
+        lineCountEl.textContent = `${lines.toLocaleString()}줄`;
+        byteCountEl.textContent = `${utf8Bytes.toLocaleString()}B / ${twoBytes.toLocaleString()}B`;
+        manuscriptInfoEl.textContent = `200자 원고지 약 ${pages}매 (UTF-8 ${utf8Bytes.toLocaleString()}바이트 · 한글2B ${twoBytes.toLocaleString()}바이트)`;
+      }
+
+      textInput.addEventListener("input", updateStats);
+
+      document.getElementById("sampleBtn").addEventListener("click", () => {
+        textInput.value = "안녕하세요! 헬로WYS 글자 수 계산기입니다.\n공백 포함과 제외, 바이트 수를 바로 확인할 수 있어요.";
+        updateStats();
+        showToast("예시 문장을 불러왔습니다.");
+      });
+
+      document.getElementById("clearBtn").addEventListener("click", () => {
+        textInput.value = "";
+        updateStats();
+        showToast("내용을 지웠습니다.");
+      });
+
+      document.getElementById("copyBtn").addEventListener("click", async () => {
+        if (!textInput.value) {
+          showToast("복사할 글자가 없습니다.");
+          return;
+        }
+        try {
+          await navigator.clipboard.writeText(textInput.value);
+          showToast("클립보드에 복사되었습니다.");
+        } catch {
+          textInput.select();
+          document.execCommand("copy");
+          showToast("복사되었습니다.");
+        }
+      });
+
+      updateStats();
+    })();
+  </script>
+</body>
+</html>
