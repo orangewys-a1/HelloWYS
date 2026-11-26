@@ -53,10 +53,11 @@
       align-items: center;
       gap: 16px;
     }
+    /* 헤더 네모 아바타 프레임 */
     .avatar-wrap {
       width: 68px;
       height: 68px;
-      border-radius: 50%;
+      border-radius: 12px;
       overflow: hidden;
       border: 2px solid rgba(255, 255, 255, 0.5);
       background: #1a3573;
@@ -119,10 +120,6 @@
       margin-bottom: 12px;
       width: fit-content;
     }
-    .badge.profile {
-      color: #0b1f4b;
-      background: #e6ecf8;
-    }
     .card h2 {
       margin: 0 0 6px;
       font-size: 19px;
@@ -137,7 +134,7 @@
       font-weight: 700;
       color: var(--acc);
     }
-    /* 그리드 빈 공간에 들어가는 큰 아바타 카드 */
+    /* 그리드 빈 공간에 들어가는 큰 네모 아바타 카드 */
     .showcase-card {
       display: flex;
       flex-direction: column;
@@ -152,9 +149,9 @@
       box-shadow: 0 4px 14px -10px rgba(11, 31, 75, 0.18);
     }
     .big-avatar-frame {
-      width: 144px;
-      height: 144px;
-      border-radius: 50%;
+      width: 156px;
+      height: 156px;
+      border-radius: 16px;
       overflow: hidden;
       border: 3px solid #ffffff;
       box-shadow: 0 10px 24px rgba(11, 31, 75, 0.16);
@@ -203,7 +200,7 @@
     <div class="wrap profile-bar">
       <div class="profile-left">
         <div class="avatar-wrap">
-          <img class="avatar" src="./avatar.png" alt="" onerror="this.style.display='none'">
+          <img class="avatar" src="./avartar2.png" alt="" onerror="this.style.display='none'">
         </div>
         <div>
           <h1>헬로WYS</h1>
@@ -258,7 +255,7 @@
         </a>
         <div class="showcase-card">
           <div class="big-avatar-frame">
-            <img class="big-avatar-img" src="./avatar.png" alt="" onerror="this.style.display='none'">
+            <img class="big-avatar-img" src="./avartar2.png" alt="" onerror="this.style.display='none'">
           </div>
           <div class="showcase-caption">헬로WYS · AI·SW 실습 스튜디오</div>
         </div>
